@@ -1,14 +1,6 @@
-
-
 import { randomUUID } from 'node:crypto'
 import { User } from '../model/user.model'
-
-//TODO: Talvez separar em arquivos diferentes
-interface UserBodyInput {
-  userName: string
-  email: string
-  password: string
-}
+import { UserBodyInput } from '../insterfaces/user.interface'
 
 export class UserService {
   static async registerUser({ userName, email, password }: UserBodyInput) {

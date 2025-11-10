@@ -1,0 +1,18 @@
+import { z } from 'zod'
+import { validatePassword, validatePasswordCharacters } from '../helpers/password.helper'
+import { UserBodyInput } from '../insterfaces/user.interface'
+
+export const userBodySchema = z.object({
+  userName: z.string().min(5).max(50).trim().toLowerCase(),
+  email: z.string().email().toLowerCase().trim(),
+  password: validatePasswordCharacters(),
+})
+.superRefine(({ userName, email, password }: UserBodyInput, ctx) => {
+  validatePassword(password, userName, email).forEach((error) => {
+    ctx.addIssue({
+      code: "custom",
+      path: ['password'],
+      message: 'Senha contém muitos caracteres repetidos',
+    })
+  })
+})

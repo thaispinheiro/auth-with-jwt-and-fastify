@@ -1,14 +1,14 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
-import { z } from 'zod'
 import { UserService } from '../services/user.service'
-import { userBodySchema } from '../schemas/user.schemas'
+import { userBodySchema } from '../schemas/user.schema'
 
-//TODO: Identificar melhorias
+//TODO: Melhorar tratativas de erros
+//TODO: jogar userBodySchema.parse(request.body) em um middleware de validação
 export async function userRoutes(app: FastifyInstance) {
   app.post('/register', async (request: FastifyRequest, reply: FastifyReply) => {
     try {
-      const { userName, email, password } = userBodySchema.parse(request.body)
-      const user = await UserService.registerUser({ userName, email, password })
+      const userData = userBodySchema.parse(request.body)
+      const user = await UserService.registerUser(userData)
       app.logger.info(`User created: { id: ${user.userId}, timestamp: ${new Date().toISOString()} }`)
       return reply.status(201).send({ message: 'User registered successfully' })
     } catch (error: any) {

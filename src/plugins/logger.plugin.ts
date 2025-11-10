@@ -1,7 +1,7 @@
 import winston from "winston"
 import fp from 'fastify-plugin'
 
-const loggerPlugin = fp(async (fastify) => {
+export default fp(async (fastify) => {
   const logger = winston.createLogger({
     level: 'info',
     format: winston.format.json(),
@@ -13,5 +13,3 @@ const loggerPlugin = fp(async (fastify) => {
 
   fastify.decorate('logger', logger)
 })
-
-export default loggerPlugin
