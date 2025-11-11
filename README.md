@@ -58,7 +58,7 @@ Um decorator `authorizeRole(role)` é usado para garantir que apenas usuários c
     preHandler: [app.verifyJWT, app.authorizeRole('admin')]
   }, async () => ({ message: 'Welcome, admin!' }))
 ```
-## 🔍 Segurança e boas práticas
+## Segurança e boas práticas
 
 - **Segregação de responsabilidades:** controllers tratam requisições, services tratam lógica de negócio.
 - **Criptografia de senha com bcrypt:** armazenamento seguro de senhas com hash e salt.
@@ -130,7 +130,7 @@ Exemplo de payload:
    ```bash
    npm run dev
    ```
-
+   
 ## Conhecimentos aplicados
 
 - JWT e autenticação stateless
@@ -142,7 +142,54 @@ Exemplo de payload:
 - Tipagem e segurança com TypeScript
 - Logs estruturados (audit trail com Winston)
 
+## Futuras Melhorias de Segurança e Controle de Acesso
+
+Além da autenticação e autorização aplicadas na camada da aplicação (via JWT e middlewares), existem oportunidades para reforçar a **segurança e o controle de acesso**, garantindo uma defesa em profundidade (**Defense in Depth**).  
+Essas medidas complementam a autenticação lógica com **camadas de proteção física, de tráfego e de autorização granular**, tornando o sistema mais robusto e preparado para cenários de produção.
+
+### 1. Proteção e Controle de Acesso a Recursos
+- **Rate Limiting e Throttling:**  
+  Limitar o número de requisições por IP ou token para prevenir abusos ou ataques de força bruta.
+- **IP Whitelisting / Blacklisting:**  
+  Permitir acesso apenas de origens confiáveis ou bloquear IPs suspeitos.
+- **Escopos e Permissões Granulares:**  
+  Expandir o controle de autorização usando *claims* adicionais no JWT, como `read:users` ou `write:admin`, permitindo controle detalhado por recurso.
+
+### 2. OAuth 2.0 / OIDC e Integração com Provedores de Identidade (IdP)
+
+Para evoluir a autenticação manual com JWT, recomenda-se integrar um **Identity Provider (IdP)** usando **OAuth 2.0** e **OpenID Connect (OIDC)**.  
+Esses padrões oferecem **autenticação federada**, **Single Sign-On (SSO)** e eliminam a necessidade de gerenciar credenciais manualmente.
+
+#### Conceitos Fundamentais
+- **OAuth 2.0**: Protocolo de autorização que permite conceder acesso limitado a recursos sem expor credenciais do usuário.  
+  - Flows comuns: *Authorization Code*, *Client Credentials*, *Implicit*, *Resource Owner Password Credentials*.
+- **OpenID Connect (OIDC)**: Camada de autenticação construída sobre OAuth 2.0.  
+  - Permite verificar a identidade do usuário e obter informações básicas (claims) no **ID Token**.
+- **Identity Provider (IdP)**: Serviço que autentica usuários e emite tokens OAuth/OIDC.  
+  - Exemplos: **Keycloak**, **Auth0**, **AWS Cognito**, **Okta**, **Google Identity Platform**.
+
+#### Benefícios
+- Autenticação federada com provedores externos.  
+- Single Sign-On (SSO) entre diferentes aplicações.  
+- Redução do risco de exposição de credenciais internas.  
+- Maior escalabilidade e interoperabilidade com múltiplos serviços.
+
+### 3. Consideração sobre o JWT_SECRET
+
+Uma preocupação crítica de segurança é a **comprometimento do JWT_SECRET**, que é usado para assinar e validar todos os tokens:
+
+- **Problemas se for perdido ou exposto:**  
+  - Tokens antigos e ativos podem ser forjados por qualquer pessoa que possua o segredo.  
+  - Logout global ou revogação de tokens se torna impossível sem redefinir o segredo.
+- **Soluções futuras:**  
+  - Implementar **rotação periódica de JWT_SECRET**, invalidação de tokens antigos via blacklist.  
+  - Armazenar secrets em **serviços seguros**, como HashiCorp Vault, AWS Secrets Manager ou Azure Key Vault.  
+  - Integrar com OAuth/OIDC para reduzir a dependência de um segredo centralizado e permitir revogação e controle de tokens de forma externa.
+
 ---
+
+Essa abordagem prepara o projeto para **cenários de produção mais complexos**, com controle fino de acesso, autenticação federada e mecanismos de mitigação de riscos caso o segredo de assinatura seja comprometido.
+
 ## 📚 Referências técnicas
 
 - [Login JWT em Node.js](https://www.rocketseat.com.br/blog/artigos/post/login-com-jwt-nodejs)
